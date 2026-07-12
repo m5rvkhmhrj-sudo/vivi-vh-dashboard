@@ -1,0 +1,14 @@
+{
+  "name": "Vivi",
+  "short_name": "Vivi",
+  "description": "Your homes, your calendar, your projects. All in one lovely place.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f7e6ea",
+  "theme_color": "#f7e6ea",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

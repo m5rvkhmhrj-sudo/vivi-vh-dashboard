@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Vivi</title>
+  <meta name="theme-color" content="#f7e3e9">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header class="topbar">
+    <h1 class="wordmark">Vivi</h1>
+    <nav class="tabs" role="tablist" aria-label="Modules">
+      <button class="tab is-active" role="tab" aria-selected="true" data-module="home">Home</button>
+      <button class="tab" role="tab" aria-selected="false" data-module="calendar">Calendar</button>
+      <button class="tab" role="tab" aria-selected="false" data-module="projects">Projects</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Module 1: Home -->
+    <section id="module-home" class="module is-active">
+      <div class="home-pads">
+        <div id="pad-villa-vista" class="notepad-slot" data-list="villa-vista"></div>
+        <div id="pad-amy-lane" class="notepad-slot" data-list="amy-lane"></div>
+      </div>
+      <div class="day-panel">
+        <div class="day-panel-head">
+          <h2 class="day-title" id="day-title">Today</h2>
+          <div class="day-nav">
+            <button id="day-prev" class="nav-btn" aria-label="Previous day">&#8249;</button>
+            <button id="day-today" class="nav-btn nav-btn-text">Today</button>
+            <button id="day-next" class="nav-btn" aria-label="Next day">&#8250;</button>
+          </div>
+        </div>
+        <div id="day-agenda" class="day-agenda"></div>
+      </div>
+    </section>
+
+    <!-- Module 2: Calendar -->
+    <section id="module-calendar" class="module">
+      <div class="cal-head">
+        <h2 class="cal-title" id="cal-title"></h2>
+        <div class="cal-nav">
+          <button id="cal-prev" class="nav-btn" aria-label="Previous month">&#8249;</button>
+          <button id="cal-today" class="nav-btn nav-btn-text">Today</button>
+          <button id="cal-next" class="nav-btn" aria-label="Next month">&#8250;</button>
+          <button id="cal-add" class="btn-primary">New event</button>
+        </div>
+      </div>
+      <div id="cal-grid" class="cal-grid"></div>
+    </section>
+
+    <!-- Module 3: Projects -->
+    <section id="module-projects" class="module">
+      <div id="projects-index" class="projects-index">
+        <div class="projects-head">
+          <h2 class="projects-title">Projects</h2>
+          <button id="project-add" class="btn-primary">New project</button>
+        </div>
+        <div id="projects-grid" class="projects-grid"></div>
+      </div>
+      <div id="project-detail" class="project-detail" hidden>
+        <button id="project-back" class="back-link">&#8249; All projects</button>
+        <div id="project-pad" class="notepad-slot"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <button id="data-export" class="footer-link">Save a backup</button>
+    <span class="footer-sep">·</span>
+    <button id="data-import" class="footer-link">Restore a backup</button>
+    <input type="file" id="data-import-file" accept="application/json" hidden>
+  </footer>
+
+  <!-- Event editor dialog (created/managed by calendar.js) -->
+  <dialog id="event-dialog" class="event-dialog"></dialog>
+
+  <!-- Project name dialog -->
+  <dialog id="project-dialog" class="event-dialog">
+    <form method="dialog" class="event-form" id="project-form">
+      <h3 class="dialog-title" id="project-dialog-title">New project</h3>
+      <div class="field">
+        <label for="project-name-input">Project name</label>
+        <input type="text" id="project-name-input" required autocomplete="off">
+      </div>
+      <div class="dialog-actions">
+        <button type="button" id="project-cancel">Cancel</button>
+        <button type="submit" class="btn-primary">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="store.js"></script>
+  <script src="todos.js"></script>
+  <script src="calendar.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
