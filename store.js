@@ -6,7 +6,7 @@ const Store = (() => {
 
   const defaults = () => ({
     lists: {
-      'villa-vista': { id: 'villa-vista', name: 'Villa Vista', items: [] },
+      'villa-vista': { id: 'villa-vista', name: 'Valle Vista', items: [] },
       'amy-lane':    { id: 'amy-lane',    name: 'Amy Lane',    items: [] },
       'jeff':        { id: 'jeff',        name: "Jeff's List", items: [] },
       'travel':      { id: 'travel',      name: 'Travel Plans', items: [] },
@@ -35,12 +35,15 @@ const Store = (() => {
       if (!raw) return defaults();
       const parsed = JSON.parse(raw);
       const def = defaults();
-      return {
+      const merged = {
         ...def,
         ...parsed,
         lists: { ...def.lists, ...parsed.lists },
         care: mergeCare(def.care, parsed.care),
       };
+      // migration: home renamed Villa Vista -> Valle Vista (2026-07-13)
+      if (merged.lists['villa-vista']) merged.lists['villa-vista'].name = 'Valle Vista';
+      return merged;
     } catch { return defaults(); }
   }
 

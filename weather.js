@@ -1,7 +1,7 @@
 // Vivi weather strip. Vanilla JS. No libs, no keys. Open-Meteo.
 var Weather = (function () {
   var LOCATIONS = [
-    { key: 'villa-vista', place: 'Villa Vista · Indian Wells, CA', lat: 33.7176, lon: -116.3409 },
+    { key: 'villa-vista', place: 'Valle Vista · Indian Wells, CA', lat: 33.7176, lon: -116.3409 },
     { key: 'amy-lane', place: 'Amy Lane · Wheaton, IL', lat: 41.8661, lon: -88.1070 }
   ];
 

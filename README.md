@@ -1,6 +1,6 @@
 # Vivi
 
-Personal productivity dashboard. Three modules: Home (Villa Vista + Amy Lane todo pads and a day agenda), monthly Calendar with repeating events, and Projects with a todo pad per project.
+Personal productivity dashboard. Three modules: Home (Valle Vista + Amy Lane todo pads and a day agenda), monthly Calendar with repeating events, and Projects with a todo pad per project.
 
 ## Install on her computer
 1. Serve the folder: `python3 -m http.server 8080` inside this folder, or host it (GitHub Pages works).

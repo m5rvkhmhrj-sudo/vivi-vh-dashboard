@@ -7,7 +7,7 @@ Read `MEMORY.md` at start of every session. After EVERY user prompt in this proj
 
 ## Product
 Three modules, single-page app:
-1. **Home** — two notepad todo lists ("Villa Vista" CA, "Amy Lane" IL) + day calendar synced to monthly calendar.
+1. **Home** — two notepad todo lists ("Valle Vista" CA, "Amy Lane" IL) + day calendar synced to monthly calendar.
 2. **Calendar** — monthly calendar, repeating events (daily/weekly/monthly/yearly), full CRUD. Same event store as day calendar.
 3. **Projects** — buttons per project, each opens its own notepad todo list.
 
