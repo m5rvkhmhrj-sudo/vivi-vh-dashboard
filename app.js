@@ -27,6 +27,8 @@
   /* ---- home pads ---- */
   Notepad.mount(document.getElementById('pad-villa-vista'), 'villa-vista');
   Notepad.mount(document.getElementById('pad-amy-lane'), 'amy-lane');
+  Notepad.mount(document.getElementById('pad-jeff'), 'jeff');
+  Notepad.mount(document.getElementById('pad-travel'), 'travel');
 
   /* ---- calendar ---- */
   Calendar.init();

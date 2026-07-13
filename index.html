@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Vivi</title>
-  <meta name="theme-color" content="#f7e3e9">
+  <meta name="theme-color" content="#f9ece1">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icons/icon-192.png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
@@ -17,6 +17,8 @@
     <nav class="tabs" role="tablist" aria-label="Modules">
       <button class="tab is-active" role="tab" aria-selected="true" data-module="home">Home</button>
       <button class="tab" role="tab" aria-selected="false" data-module="calendar">Calendar</button>
+      <button class="tab" role="tab" aria-selected="false" data-module="travel">Travel</button>
+      <button class="tab" role="tab" aria-selected="false" data-module="care">Care</button>
       <button class="tab" role="tab" aria-selected="false" data-module="projects">Projects</button>
     </nav>
   </header>
@@ -24,9 +26,11 @@
   <main>
     <!-- Module 1: Home -->
     <section id="module-home" class="module is-active">
-      <div class="home-pads">
+      <div id="weather-strip" class="weather-strip"></div>
+      <div class="home-pads home-pads-3">
         <div id="pad-villa-vista" class="notepad-slot" data-list="villa-vista"></div>
         <div id="pad-amy-lane" class="notepad-slot" data-list="amy-lane"></div>
+        <div id="pad-jeff" class="notepad-slot" data-list="jeff"></div>
       </div>
       <div class="day-panel">
         <div class="day-panel-head">
@@ -53,6 +57,57 @@
         </div>
       </div>
       <div id="cal-grid" class="cal-grid"></div>
+    </section>
+
+    <!-- Module: Travel -->
+    <section id="module-travel" class="module">
+      <div class="travel-layout">
+        <div id="pad-travel" class="notepad-slot" data-list="travel"></div>
+        <div class="notes-card">
+          <h2 class="notes-title">Trip Notes</h2>
+          <textarea id="travel-notes" class="notes-area" placeholder="Dates, flights, house prep, who is watching what…"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- Module: Care -->
+    <section id="module-care" class="module">
+      <div class="care-layout">
+        <div class="care-section" data-person="mark">
+          <h2 class="care-title">Mark's Care</h2>
+          <div class="notes-card">
+            <h3 class="notes-subtitle">Meeting Notes</h3>
+            <textarea class="notes-area care-notes" placeholder="Notes from meetings about Mark's care…"></textarea>
+          </div>
+          <div class="contacts-card">
+            <h3 class="notes-subtitle">Contacts</h3>
+            <ul class="contacts-list"></ul>
+            <form class="contact-add-form">
+              <input type="text" class="contact-name" placeholder="Name" required>
+              <input type="text" class="contact-role" placeholder="Role">
+              <input type="tel" class="contact-phone" placeholder="Phone">
+              <button type="submit" class="btn-primary">Add</button>
+            </form>
+          </div>
+        </div>
+        <div class="care-section" data-person="dad">
+          <h2 class="care-title">Dad's Hospice</h2>
+          <div class="notes-card">
+            <h3 class="notes-subtitle">Updates</h3>
+            <textarea class="notes-area care-notes" placeholder="Hospice updates for Dad…"></textarea>
+          </div>
+          <div class="contacts-card">
+            <h3 class="notes-subtitle">Contacts</h3>
+            <ul class="contacts-list"></ul>
+            <form class="contact-add-form">
+              <input type="text" class="contact-name" placeholder="Name" required>
+              <input type="text" class="contact-role" placeholder="Role">
+              <input type="tel" class="contact-phone" placeholder="Phone">
+              <button type="submit" class="btn-primary">Add</button>
+            </form>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- Module 3: Projects -->
@@ -99,6 +154,8 @@
   <script src="store.js"></script>
   <script src="todos.js"></script>
   <script src="calendar.js"></script>
+  <script src="weather.js"></script>
+  <script src="notes.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

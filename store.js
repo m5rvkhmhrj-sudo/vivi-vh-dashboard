@@ -8,10 +8,22 @@ const Store = (() => {
     lists: {
       'villa-vista': { id: 'villa-vista', name: 'Villa Vista', items: [] },
       'amy-lane':    { id: 'amy-lane',    name: 'Amy Lane',    items: [] },
+      'jeff':        { id: 'jeff',        name: "Jeff's List", items: [] },
+      'travel':      { id: 'travel',      name: 'Travel Plans', items: [] },
     },
     projects: [],   // [{id, name}] — each project's todos live in lists[id]
     events: [],     // [{id, title, date:'YYYY-MM-DD', time:'HH:MM'|null, endTime, color,
                     //   notes, repeat:'none'|'daily'|'weekly'|'monthly'|'yearly', repeatUntil:'YYYY-MM-DD'|null}]
+    travelNotes: '',
+    care: {
+      mark: { notes: '', contacts: [] },
+      dad:  { notes: '', contacts: [] },
+    },
+  });
+
+  const mergeCare = (defCare, parsedCare) => ({
+    mark: { ...defCare.mark, ...(parsedCare && parsedCare.mark) },
+    dad:  { ...defCare.dad,  ...(parsedCare && parsedCare.dad)  },
   });
 
   let data = load();
@@ -22,7 +34,13 @@ const Store = (() => {
       const raw = localStorage.getItem(KEY);
       if (!raw) return defaults();
       const parsed = JSON.parse(raw);
-      return { ...defaults(), ...parsed, lists: { ...defaults().lists, ...parsed.lists } };
+      const def = defaults();
+      return {
+        ...def,
+        ...parsed,
+        lists: { ...def.lists, ...parsed.lists },
+        care: mergeCare(def.care, parsed.care),
+      };
     } catch { return defaults(); }
   }
 
@@ -97,6 +115,28 @@ const Store = (() => {
     },
     deleteEvent(id) { data.events = data.events.filter(e => e.id !== id); save(); },
 
+    /* ---- travel notes ---- */
+    setTravelNotes(text) { data.travelNotes = text; save(); },
+
+    /* ---- care (Mark / Dad) ---- */
+    setCareNotes(person, text) { data.care[person].notes = text; save(); },
+    addContact(person, { name, role, phone } = {}) {
+      const n = (name || '').trim();
+      if (!n) return;
+      data.care[person].contacts.push({
+        id: uid(),
+        name: n,
+        role: (role || '').trim(),
+        phone: (phone || '').trim(),
+      });
+      save();
+    },
+    deleteContact(person, id) {
+      const c = data.care[person];
+      c.contacts = c.contacts.filter(x => x.id !== id);
+      save();
+    },
+
     /* ---- backup ---- */
     exportJSON: () => JSON.stringify(data, null, 2),
     importJSON(json) {
@@ -104,7 +144,13 @@ const Store = (() => {
       if (!parsed || typeof parsed !== 'object' || !parsed.lists) {
         throw new Error('not a Vivi backup');
       }
-      data = { ...defaults(), ...parsed, lists: { ...defaults().lists, ...parsed.lists } };
+      const def = defaults();
+      data = {
+        ...def,
+        ...parsed,
+        lists: { ...def.lists, ...parsed.lists },
+        care: mergeCare(def.care, parsed.care),
+      };
       save();
     },
   };

@@ -1,5 +1,10 @@
 # Vivi Memory — evolves every prompt
 
+## 2026-07-13 — Vicki's review round
+- Client = Vicki Heise. Change pink → Hermes orange (keep navy, keep classy). Add: weather for both homes (Amy Lane = Wheaton IL, Villa/Valle Vista = Indian Wells CA), Jeff's to-do list (she tracks it), Travel plans module (CA↔IL winters), Mark's care notes + contacts, Dad's hospice updates + contacts.
+- She spelled it "Valle Vista" this time; original brief said "Villa Vista". Kept Villa Vista — flag to Bill to confirm.
+- Bill: no API budget spend for her → weather via Open-Meteo (free, keyless). Build with sonnet/opus subagents, Fable minimal. Goal: on her computer (site is live at github.io/vivi, she installs from there).
+
 ## 2026-07-11 — kickoff
 - Client wants 3-module dashboard: Home (Villa Vista + Amy Lane notepad todos + day calendar), Monthly Calendar (repeating events, yearly routines, synced to day view), Projects (button per project → own notepad todo list).
 - Style: pink with navy accent, very feminine, very classy. Site name "Vivi" in cursive. ONLY cursive + Times New Roman fonts.
