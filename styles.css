@@ -11,6 +11,14 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: 'Rokkitt';
+  src: url('fonts/rokkitt-bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --blush: #f9ece1;
   --paper: #fffdf8;
@@ -110,9 +118,9 @@ textarea {
 
 .wordmark {
   position: relative;
-  font-family: var(--script);
-  font-weight: 400;
-  font-size: 3rem;
+  font-family: 'Memphis', 'Memphis LT Std', 'Rokkitt', var(--serif);
+  font-weight: 700;
+  font-size: 2.6rem;
   line-height: 1.1;
   color: var(--navy);
   padding: 0 0.35em 0.15em;

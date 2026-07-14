@@ -1,6 +1,7 @@
 # Vivi Memory — evolves every prompt
 
 ## 2026-07-14 — exact orange
+- Round 2: Bill wants #ed7933 on ALL elements incl buttons. Buttons + active tab now bg #ed7933 with NAVY text (4.96:1 AA; white on it fails at 2.8). Hover = lift + shadow, not color change. --rose-strong no longer used on surfaces. sw cache v6, live.
 - Bill supplied a swatch; sampled #ed7933 as THE Hermes orange. --rose #ed7933, --rose-deep #d05f15; kept --rose-strong #b3540d / --rose-text #9c4a0d where white/small text needs AA (#ed7933 itself is only 2.8:1). Icons regenerated, sw cache v5, pushed.
 
 ## 2026-07-13 — Vicki's review round
