@@ -123,7 +123,7 @@ const Store = (() => {
 
     /* ---- care (Mark / Dad) ---- */
     setCareNotes(person, text) { data.care[person].notes = text; save(); },
-    addContact(person, { name, role, phone } = {}) {
+    addContact(person, { name, role, phone, email } = {}) {
       const n = (name || '').trim();
       if (!n) return;
       data.care[person].contacts.push({
@@ -131,6 +131,7 @@ const Store = (() => {
         name: n,
         role: (role || '').trim(),
         phone: (phone || '').trim(),
+        email: (email || '').trim(),
       });
       save();
     },

@@ -96,6 +96,14 @@
         }
       }
 
+      if (contact.email) {
+        var emailLink = document.createElement('a');
+        emailLink.className = 'contact-email';
+        emailLink.href = 'mailto:' + contact.email;
+        emailLink.textContent = contact.email;
+        li.appendChild(emailLink);
+      }
+
       var delBtn = document.createElement('button');
       delBtn.className = 'contact-del';
       delBtn.setAttribute('aria-label', 'Delete contact');
@@ -146,6 +154,7 @@
         var nameInput = form.querySelector('.contact-name');
         var roleInput = form.querySelector('.contact-role');
         var phoneInput = form.querySelector('.contact-phone');
+        var emailInput = form.querySelector('.contact-email');
 
         var name = (nameInput.value || '').trim();
         if (!name) return;
@@ -153,7 +162,8 @@
         Store.addContact(person, {
           name: name,
           role: (roleInput.value || '').trim(),
-          phone: (phoneInput.value || '').trim()
+          phone: (phoneInput.value || '').trim(),
+          email: emailInput ? (emailInput.value || '').trim() : ''
         });
 
         form.reset();

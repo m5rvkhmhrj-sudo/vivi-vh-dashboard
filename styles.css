@@ -1201,3 +1201,13 @@ main {
   outline-offset: 2px;
   border-color: var(--rose);
 }
+
+.contact-email {
+  font-size: 0.95rem;
+  color: var(--navy);
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+  overflow-wrap: anywhere;
+}
+
+.contact-email:hover { text-decoration-color: var(--rose); }
