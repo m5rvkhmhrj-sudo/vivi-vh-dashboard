@@ -2,7 +2,7 @@
 
 ## 2026-07-13 — Vicki's review round
 - Client = Vicki Heise. Change pink → Hermes orange (keep navy, keep classy). Add: weather for both homes (Amy Lane = Wheaton IL, Villa/Valle Vista = Indian Wells CA), Jeff's to-do list (she tracks it), Travel plans module (CA↔IL winters), Mark's care notes + contacts, Dad's hospice updates + contacts.
-- She spelled it "Valle Vista" this time; original brief said "Villa Vista". Kept Villa Vista — flag to Bill to confirm.
+- Bill confirmed: it is "Valle Vista". Renamed everywhere 2026-07-13 (display strings + weather label; list id stays 'villa-vista' for saved-data compat; load() migration forces the new name onto existing saves). sw cache → vivi-v4.
 - Bill: no API budget spend for her → weather via Open-Meteo (free, keyless). Build with sonnet/opus subagents, Fable minimal. Goal: on her computer (site is live at github.io/vivi, she installs from there).
 - Shipped 2026-07-13: 4 sonnet builders (palette #e8641b Hermes orange AA-checked, store v2 w/ care/travel/jeff + deep merges, weather.js Open-Meteo 30-min cache, notes.js debounced autosave + contacts) + opus verifier (28/28 pass, both viewports). Fable only did: index.html shell, 2 Notepad.mount lines, mobile tab-overflow CSS fix. Fixed mobile tab clipping (.tabs overflow-x auto). Screenshot lesson: wait for document.fonts.ready before judging typography.
 - sw cache now vivi-v3; pushed to GitHub Pages same day.
