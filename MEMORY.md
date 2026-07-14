@@ -1,5 +1,8 @@
 # Vivi Memory — evolves every prompt
 
+## 2026-07-14 — final tweaks
+- Care contacts now have Email field (mailto link in row); "Dad's Hospice" renamed "Dad's Care". sw v8, live. Verified add/persist/reload + mailto href.
+
 ## 2026-07-14 — exact orange
 - Wordmark: Bill asked for "Memphis bold". Memphis = paid Linotype font, not embeddable on public site + not installed locally. Shipped Rokkitt Bold (free geometric slab, closest match) self-hosted, with 'Memphis','Memphis LT Std' first in the stack so real Memphis renders wherever installed. Wordmark no longer cursive; pad titles/headings still Great Vibes. sw v7.
 - Round 2: Bill wants #ed7933 on ALL elements incl buttons. Buttons + active tab now bg #ed7933 with NAVY text (4.96:1 AA; white on it fails at 2.8). Hover = lift + shadow, not color change. --rose-strong no longer used on surfaces. sw cache v6, live.

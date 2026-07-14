@@ -17,12 +17,14 @@ const Store = (() => {
     travelNotes: '',
     care: {
       mark: { notes: '', contacts: [] },
+      jeff: { notes: '', contacts: [] },
       dad:  { notes: '', contacts: [] },
     },
   });
 
   const mergeCare = (defCare, parsedCare) => ({
     mark: { ...defCare.mark, ...(parsedCare && parsedCare.mark) },
+    jeff: { ...defCare.jeff, ...(parsedCare && parsedCare.jeff) },
     dad:  { ...defCare.dad,  ...(parsedCare && parsedCare.dad)  },
   });
 
