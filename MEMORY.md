@@ -1,5 +1,8 @@
 # Vivi Memory — evolves every prompt
 
+## 2026-07-14 — exact orange
+- Bill supplied a swatch; sampled #ed7933 as THE Hermes orange. --rose #ed7933, --rose-deep #d05f15; kept --rose-strong #b3540d / --rose-text #9c4a0d where white/small text needs AA (#ed7933 itself is only 2.8:1). Icons regenerated, sw cache v5, pushed.
+
 ## 2026-07-13 — Vicki's review round
 - Client = Vicki Heise. Change pink → Hermes orange (keep navy, keep classy). Add: weather for both homes (Amy Lane = Wheaton IL, Villa/Valle Vista = Indian Wells CA), Jeff's to-do list (she tracks it), Travel plans module (CA↔IL winters), Mark's care notes + contacts, Dad's hospice updates + contacts.
 - Bill confirmed: it is "Valle Vista". Renamed everywhere 2026-07-13 (display strings + weather label; list id stays 'villa-vista' for saved-data compat; load() migration forces the new name onto existing saves). sw cache → vivi-v4.
