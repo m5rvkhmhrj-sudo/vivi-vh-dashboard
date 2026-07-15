@@ -2,6 +2,7 @@
 
 ## 2026-07-14 — final tweaks
 - Care contacts now have Email field (mailto link in row); "Dad's Hospice" renamed "Dad's Care". sw v8, live. Verified add/persist/reload + mailto href.
+- Added Jeff's Care section (Notes + Contacts, same format) between Mark and Dad. store care.jeff + mergeCare updated so existing saves migrate cleanly. notes.js needed no changes (generic over .care-section). sw v9, live. Verified: old data intact, jeff notes + contact persist.
 
 ## 2026-07-14 — exact orange
 - Wordmark: Bill asked for "Memphis bold". Memphis = paid Linotype font, not embeddable on public site + not installed locally. Shipped Rokkitt Bold (free geometric slab, closest match) self-hosted, with 'Memphis','Memphis LT Std' first in the stack so real Memphis renders wherever installed. Wordmark no longer cursive; pad titles/headings still Great Vibes. sw v7.

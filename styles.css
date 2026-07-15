@@ -1211,3 +1211,10 @@ main {
 }
 
 .contact-email:hover { text-decoration-color: var(--rose); }
+
+.sync-status {
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--rose-text);
+  margin-left: 0.6rem;
+}

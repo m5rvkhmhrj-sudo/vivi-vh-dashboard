@@ -1,4 +1,4 @@
-const CACHE = 'vivi-v9';
+const CACHE = 'vivi-v10';
 const ASSETS = [
   './',
   './index.html',
@@ -9,6 +9,7 @@ const ASSETS = [
   './app.js',
   './weather.js',
   './notes.js',
+  './sync.js',
   './manifest.json',
   './fonts/great-vibes.woff2',
   './fonts/rokkitt-bold.woff2',
