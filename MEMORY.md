@@ -1,5 +1,9 @@
 # Vivi Memory — evolves every prompt
 
+## 2026-07-15 — link rotation + pairing
+- Bill had shared the old link; wanted it dead. Repo renamed vivi → vivi-vh-dashboard: old URL 404s, NEW URL https://m5rvkhmhrj-sudo.github.io/vivi-vh-dashboard/
+- Security fix while at it: sync code no longer hardcoded in public source. App shows a one-time "family code" pairing dialog per device ("Not now" = works local-only). Code rotated to vivi-7D028zRtmhRm1jQS5Ajas8G-7apvGtBS (Bill types it on her Dell + phone at install; NOT in repo). Old KV entry deleted, new one seeded clean. sw v12. Verified: pairing dialog, both-direction sync with new code, no-code local fallback, 0 secrets in served source.
+
 ## 2026-07-15 — cross-device sync, install day
 - Vicki approved; Bill installing on her Dell + phone today. Needs synced data both devices.
 - Bill worried about Supabase free-tier pausing → switched to Cloudflare Worker + KV (never pauses). Worker "vivi-sync" at https://vivi-sync.billenright.workers.dev, code at ~/Desktop/vivi-sync-worker, KV namespace VIVI (89c4e1a3912c4b9f9b478a5d8169ad08), account 5ae33cb572f3511d40b10b4ab37b7594, workers.dev subdomain "billenright" registered. Supabase path abandoned (sql file deleted, no table created).

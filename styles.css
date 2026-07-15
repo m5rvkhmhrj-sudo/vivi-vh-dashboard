@@ -31,7 +31,7 @@
   --rule: #cfd8ea;
   --margin-red: #f2a878;
 
-  --script: 'Great Vibes', cursive;
+  --script: 'Great Vibes', 'Segoe Script', 'Apple Chancery', cursive;
   --serif: 'Times New Roman', Times, serif;
 
   --pad-rhythm: 2.2rem;              /* ruled-line spacing */

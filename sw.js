@@ -1,4 +1,4 @@
-const CACHE = 'vivi-v12';
+const CACHE = 'vivi-v13';
 const ASSETS = [
   './',
   './index.html',
