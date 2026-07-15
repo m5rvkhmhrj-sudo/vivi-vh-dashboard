@@ -1,5 +1,8 @@
 # Vivi Memory — evolves every prompt
 
+## 2026-07-15 — font fix (Dell looked different)
+- Root cause: both self-hosted woff2s were the wrong Google subset — missing basic latin glyphs (V,i,v!). Each OS filled missing glyphs from different local fonts → Mac/iPhone looked right-ish, Dell wrong. Rebuilt complete woff2s from official google/fonts TTFs via fonttools (subset to full latin; Rokkitt variable pinned to wght 700). Verified zero missing glyphs. Added 'Segoe Script' fallback before generic cursive so a blocked font never falls to Comic Sans on Windows. sw v13, live. Lesson: verify glyph coverage of any downloaded Google woff2 (they're unicode-range subsets).
+
 ## 2026-07-15 — link rotation + pairing
 - Bill had shared the old link; wanted it dead. Repo renamed vivi → vivi-vh-dashboard: old URL 404s, NEW URL https://m5rvkhmhrj-sudo.github.io/vivi-vh-dashboard/
 - Security fix while at it: sync code no longer hardcoded in public source. App shows a one-time "family code" pairing dialog per device ("Not now" = works local-only). Code rotated to vivi-7D028zRtmhRm1jQS5Ajas8G-7apvGtBS (Bill types it on her Dell + phone at install; NOT in repo). Old KV entry deleted, new one seeded clean. sw v12. Verified: pairing dialog, both-direction sync with new code, no-code local fallback, 0 secrets in served source.

@@ -1,6 +1,11 @@
 /* Vivi app glue — tabs, home pads, projects module, PWA registration. */
 
 (() => {
+  /* ---- per-OS script font (client wants Fairwater Script look on Windows) ---- */
+  if (/Windows/i.test(navigator.userAgent)) {
+    document.documentElement.classList.add('os-windows');
+  }
+
   /* ---- tabs ---- */
   const tabs = document.querySelectorAll('.tab');
   const modules = document.querySelectorAll('.module');

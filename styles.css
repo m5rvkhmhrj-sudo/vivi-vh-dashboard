@@ -12,6 +12,14 @@
 }
 
 @font-face {
+  font-family: 'Sacramento';
+  src: url('fonts/sacramento.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
   font-family: 'Rokkitt';
   src: url('fonts/rokkitt-bold.woff2') format('woff2');
   font-weight: 700;
@@ -32,6 +40,11 @@
   --margin-red: #f2a878;
 
   --script: 'Great Vibes', 'Segoe Script', 'Apple Chancery', cursive;
+}
+
+/* Windows gets the Fairwater Script look (real Fairwater if installed, Sacramento otherwise) */
+:root.os-windows {
+  --script: 'Fairwater Script', 'Sacramento', 'Segoe Script', cursive;
   --serif: 'Times New Roman', Times, serif;
 
   --pad-rhythm: 2.2rem;              /* ruled-line spacing */
