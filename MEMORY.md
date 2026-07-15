@@ -1,5 +1,11 @@
 # Vivi Memory — evolves every prompt
 
+## 2026-07-15 — cross-device sync, install day
+- Vicki approved; Bill installing on her Dell + phone today. Needs synced data both devices.
+- Bill worried about Supabase free-tier pausing → switched to Cloudflare Worker + KV (never pauses). Worker "vivi-sync" at https://vivi-sync.billenright.workers.dev, code at ~/Desktop/vivi-sync-worker, KV namespace VIVI (89c4e1a3912c4b9f9b478a5d8169ad08), account 5ae33cb572f3511d40b10b4ab37b7594, workers.dev subdomain "billenright" registered. Supabase path abandoned (sql file deleted, no table created).
+- Sync design: whole-blob last-write-wins keyed by secret id vivi-wkk2hKE73YmvDVmNf3pUJDdSbf3vPWtl (in sync.js). Push debounced 1.5s; pull on load/focus/20s poll. Pull deferred only while unsent draft or keystroke <3s (first version deferred on any focused input — blocked forever because notepad add-box keeps focus; fixed). Offline = app keeps working locally.
+- Verified two separate browser contexts: todos both directions + calendar event sync. Server KV wiped to clean defaults before install. sw v11. LIVE.
+
 ## 2026-07-14 — final tweaks
 - Care contacts now have Email field (mailto link in row); "Dad's Hospice" renamed "Dad's Care". sw v8, live. Verified add/persist/reload + mailto href.
 - Added Jeff's Care section (Notes + Contacts, same format) between Mark and Dad. store care.jeff + mergeCare updated so existing saves migrate cleanly. notes.js needed no changes (generic over .care-section). sw v9, live. Verified: old data intact, jeff notes + contact persist.

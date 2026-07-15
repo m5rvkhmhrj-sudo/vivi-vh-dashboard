@@ -4,7 +4,74 @@
 
 var Sync = (() => {
   var WORKER_URL = 'https://vivi-sync.billenright.workers.dev/';
-  var SYNC_ID = 'vivi-wkk2hKE73YmvDVmNf3pUJDdSbf3vPWtl';
+  var LS_SYNC_CODE = 'vivi-sync-code';
+  var SYNC_ID = null; // set from localStorage or the pairing dialog; never in source
+
+  function loadSyncCode() {
+    try { SYNC_ID = localStorage.getItem(LS_SYNC_CODE); } catch { SYNC_ID = null; }
+    return SYNC_ID;
+  }
+
+  function saveSyncCode(code) {
+    SYNC_ID = code;
+    try { localStorage.setItem(LS_SYNC_CODE, code); } catch {}
+  }
+
+  function askForCode() {
+    if (document.getElementById('sync-code-dialog')) return;
+    var dlg = document.createElement('dialog');
+    dlg.id = 'sync-code-dialog';
+    dlg.className = 'event-dialog';
+
+    var form = document.createElement('form');
+    form.method = 'dialog';
+    form.className = 'event-form';
+
+    var h = document.createElement('h3');
+    h.className = 'dialog-title';
+    h.textContent = 'Connect your devices';
+
+    var p = document.createElement('p');
+    p.textContent = 'Enter your family code to keep this device in sync. The same code goes on every device.';
+
+    var field = document.createElement('div');
+    field.className = 'field';
+    var label = document.createElement('label');
+    label.textContent = 'Family code';
+    label.setAttribute('for', 'sync-code-input');
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.id = 'sync-code-input';
+    input.autocomplete = 'off';
+    input.required = true;
+    field.append(label, input);
+
+    var actions = document.createElement('div');
+    actions.className = 'dialog-actions';
+    var later = document.createElement('button');
+    later.type = 'button';
+    later.textContent = 'Not now';
+    later.addEventListener('click', function () { dlg.close(); });
+    var save = document.createElement('button');
+    save.type = 'submit';
+    save.className = 'btn-primary';
+    save.textContent = 'Connect';
+    actions.append(later, save);
+
+    form.append(h, p, field, actions);
+    form.addEventListener('submit', function () {
+      var code = (input.value || '').trim();
+      if (/^vivi-[A-Za-z0-9_-]{24,}$/.test(code)) {
+        saveSyncCode(code);
+        pullNow();
+        startLoops();
+      }
+    });
+
+    dlg.appendChild(form);
+    document.body.appendChild(dlg);
+    dlg.showModal();
+  }
 
   var LS_LAST_PUSH = 'vivi-sync-last-push';
   var LS_SERVER_TS = 'vivi-sync-server-ts';
@@ -91,6 +158,7 @@ var Sync = (() => {
   }
 
   function pushNow() {
+    if (!SYNC_ID) return Promise.resolve();
     setStatus('syncing');
     var payload = Store.get();
     return workerPut(payload)
@@ -119,7 +187,7 @@ var Sync = (() => {
   }
 
   function pullNow() {
-    if (pulling) return Promise.resolve();
+    if (!SYNC_ID || pulling) return Promise.resolve();
     pulling = true;
     setStatus('syncing');
     return workerGet()
@@ -182,19 +250,16 @@ var Sync = (() => {
     pullNow();
   }
 
-  function init() {
-    if (initialized) return;
-    initialized = true;
+  var loopsStarted = false;
 
-    ensureDot();
-    setStatus('syncing');
+  function startLoops() {
+    if (loopsStarted) return;
+    loopsStarted = true;
 
     Store.subscribe(function () {
       if (applying) return;
       schedulePush();
     });
-
-    pullNow();
 
     setInterval(pollTick, POLL_MS);
 
@@ -202,6 +267,23 @@ var Sync = (() => {
     document.addEventListener('visibilitychange', function () {
       if (document.visibilityState === 'visible') pollTick();
     });
+  }
+
+  function init() {
+    if (initialized) return;
+    initialized = true;
+
+    ensureDot();
+
+    if (!loadSyncCode()) {
+      setStatus('offline');
+      askForCode();
+      return; // app works locally; sync starts once a code is entered
+    }
+
+    setStatus('syncing');
+    pullNow();
+    startLoops();
   }
 
   return { init: init, pushNow: pushNow, pullNow: pullNow };
