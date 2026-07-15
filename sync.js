@@ -1,10 +1,9 @@
-/* Vivi cross-device sync — last-write-wins whole-blob sync against Supabase
-   via PostgREST rpc endpoints. No supabase-js, plain fetch only.
+/* Vivi cross-device sync — last-write-wins whole-blob sync against a
+   Cloudflare Worker + KV (never pauses, free tier). Plain fetch only.
    Store (localStorage) stays the source of truth; sync is additive. */
 
 var Sync = (() => {
-  var SUPABASE_URL = 'https://dtdrnrklarwtplfsbskp.supabase.co';
-  var SUPABASE_KEY = 'sb_publishable__VwLgxHY7HvH1k8aiG_Uig_Sr-Os1c7';
+  var WORKER_URL = 'https://vivi-sync.billenright.workers.dev/';
   var SYNC_ID = 'vivi-wkk2hKE73YmvDVmNf3pUJDdSbf3vPWtl';
 
   var LS_LAST_PUSH = 'vivi-sync-last-push';
@@ -20,12 +19,8 @@ var Sync = (() => {
   var initialized = false;
   var dotEl = null;
 
-  function headers() {
-    return {
-      'apikey': SUPABASE_KEY,
-      'Authorization': 'Bearer ' + SUPABASE_KEY,
-      'Content-Type': 'application/json',
-    };
+  function endpoint() {
+    return WORKER_URL + '?id=' + encodeURIComponent(SYNC_ID);
   }
 
   function getServerTs() {
@@ -38,11 +33,19 @@ var Sync = (() => {
     try { localStorage.setItem(LS_LAST_PUSH, ts); } catch {}
   }
 
+  var lastKeyAt = 0;
+  document.addEventListener('keydown', function () { lastKeyAt = Date.now(); }, true);
+
   function isTypingFocus() {
     var el = document.activeElement;
     if (!el) return false;
     var tag = el.tagName ? el.tagName.toLowerCase() : '';
-    return tag === 'input' || tag === 'textarea' || el.isContentEditable === true;
+    var editable = tag === 'input' || tag === 'textarea' || el.isContentEditable === true;
+    if (!editable) return false;
+    // only defer a pull if there is an unsent draft or very recent typing
+    var hasDraft = (tag === 'input' || tag === 'textarea') && (el.value || '').trim() !== '';
+    var recentKeys = Date.now() - lastKeyAt < 3000;
+    return hasDraft || recentKeys;
   }
 
   function ensureDot() {
@@ -69,23 +72,30 @@ var Sync = (() => {
     el.className = 'sync-status sync-status--' + state;
   }
 
-  function rpc(fn, body) {
-    return fetch(SUPABASE_URL + '/rest/v1/rpc/' + fn, {
-      method: 'POST',
-      headers: headers(),
-      body: JSON.stringify(body),
+  function workerGet() {
+    return fetch(endpoint(), { method: 'GET' }).then(function (res) {
+      if (!res.ok) throw new Error('sync get failed: ' + res.status);
+      return res.json(); // null, or { data, updated_at }
+    });
+  }
+
+  function workerPut(payload) {
+    return fetch(endpoint(), {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
     }).then(function (res) {
-      if (!res.ok) throw new Error('rpc ' + fn + ' failed: ' + res.status);
-      return res.json();
+      if (!res.ok) throw new Error('sync put failed: ' + res.status);
+      return res.json(); // { updated_at }
     });
   }
 
   function pushNow() {
     setStatus('syncing');
     var payload = Store.get();
-    return rpc('vivi_put', { sync_id: SYNC_ID, payload: payload })
-      .then(function (updatedAt) {
-        var ts = typeof updatedAt === 'string' ? updatedAt : (updatedAt && updatedAt.updated_at);
+    return workerPut(payload)
+      .then(function (result) {
+        var ts = result && result.updated_at;
         if (ts) {
           setLastPush(ts);
           setServerTs(ts);
@@ -112,14 +122,13 @@ var Sync = (() => {
     if (pulling) return Promise.resolve();
     pulling = true;
     setStatus('syncing');
-    return rpc('vivi_get', { sync_id: SYNC_ID })
-      .then(function (rows) {
-        if (!Array.isArray(rows) || rows.length === 0) {
+    return workerGet()
+      .then(function (row) {
+        if (!row || !row.data) {
           // no server row yet — push local up to seed it
           pulling = false;
           return pushNow();
         }
-        var row = rows[0];
         var serverTs = row.updated_at;
         var serverData = row.data;
         var knownTs = getServerTs();
