@@ -48,7 +48,75 @@
     };
   }
 
-  function renderContacts(section, person) {
+  function renderEditRow(li, section, person, contact, state) {
+    li.className = 'contact-row is-editing';
+
+    var form = document.createElement('form');
+    form.className = 'contact-edit-form';
+
+    var fields = [
+      { key: 'name', placeholder: 'Name', type: 'text' },
+      { key: 'role', placeholder: 'Role', type: 'text' },
+      { key: 'phone', placeholder: 'Phone', type: 'tel' },
+      { key: 'email', placeholder: 'Email', type: 'email' }
+    ];
+
+    var firstInput = null;
+    fields.forEach(function (f) {
+      var input = document.createElement('input');
+      input.type = f.type;
+      input.placeholder = f.placeholder;
+      input.setAttribute('aria-label', f.placeholder);
+      input.value = state.draft[f.key] || '';
+      if (f.key === 'name') input.required = true;
+      input.addEventListener('input', function () {
+        state.draft[f.key] = input.value;
+      });
+      if (!firstInput) firstInput = input;
+      form.appendChild(input);
+    });
+
+    var saveBtn = document.createElement('button');
+    saveBtn.type = 'submit';
+    saveBtn.className = 'btn-primary';
+    saveBtn.textContent = 'Save';
+    form.appendChild(saveBtn);
+
+    var cancelBtn = document.createElement('button');
+    cancelBtn.type = 'button';
+    cancelBtn.className = 'contact-cancel';
+    cancelBtn.textContent = 'Cancel';
+    cancelBtn.addEventListener('click', function () {
+      state.editingId = null;
+      state.draft = null;
+      renderContacts(section, person, state);
+    });
+    form.appendChild(cancelBtn);
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var draft = state.draft;
+      state.editingId = null;
+      state.draft = null;
+      Store.updateContact(person, contact.id, draft);
+    });
+
+    form.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        cancelBtn.click();
+      }
+    });
+
+    li.appendChild(form);
+
+    if (state.focusPending && firstInput) {
+      state.focusPending = false;
+      firstInput.focus();
+    }
+  }
+
+  function renderContacts(section, person, state) {
     var list = section.querySelector('.contacts-list');
     if (!list) return;
 
@@ -68,14 +136,37 @@
       return;
     }
 
+    // tel: links only make sense on devices that can place calls
+    var canCall = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+
     contacts.forEach(function (contact) {
       var li = document.createElement('li');
       li.className = 'contact-row';
       li.dataset.id = contact.id;
 
+      if (state && state.editingId === contact.id) {
+        renderEditRow(li, section, person, contact, state);
+        list.appendChild(li);
+        return;
+      }
+
+      function startEdit() {
+        state.editingId = contact.id;
+        state.draft = {
+          name: contact.name || '',
+          role: contact.role || '',
+          phone: contact.phone || '',
+          email: contact.email || ''
+        };
+        state.focusPending = true;
+        renderContacts(section, person, state);
+      }
+
       var nameSpan = document.createElement('span');
       nameSpan.className = 'contact-name';
       nameSpan.textContent = contact.name;
+      nameSpan.title = 'Click to edit';
+      nameSpan.addEventListener('click', startEdit);
       li.appendChild(nameSpan);
 
       if (contact.role) {
@@ -87,12 +178,19 @@
 
       if (contact.phone) {
         var href = telHref(contact.phone);
-        if (href) {
+        if (canCall && href) {
           var phoneLink = document.createElement('a');
           phoneLink.className = 'contact-phone';
           phoneLink.href = 'tel:' + href;
           phoneLink.textContent = contact.phone;
           li.appendChild(phoneLink);
+        } else {
+          var phoneSpan = document.createElement('span');
+          phoneSpan.className = 'contact-phone contact-phone-static';
+          phoneSpan.textContent = contact.phone;
+          phoneSpan.title = 'Click to edit';
+          phoneSpan.addEventListener('click', startEdit);
+          li.appendChild(phoneSpan);
         }
       }
 
@@ -103,6 +201,14 @@
         emailLink.textContent = contact.email;
         li.appendChild(emailLink);
       }
+
+      var editBtn = document.createElement('button');
+      editBtn.className = 'contact-edit';
+      editBtn.type = 'button';
+      editBtn.setAttribute('aria-label', 'Edit ' + contact.name);
+      editBtn.textContent = 'Edit';
+      editBtn.addEventListener('click', startEdit);
+      li.appendChild(editBtn);
 
       var delBtn = document.createElement('button');
       delBtn.className = 'contact-del';
@@ -124,6 +230,7 @@
     var person = section.dataset.person;
     if (!person) return null;
 
+    var state = { editingId: null, draft: null, focusPending: false };
     var textarea = section.querySelector('.care-notes');
     var syncNotes = null;
 
@@ -145,7 +252,7 @@
       };
     }
 
-    renderContacts(section, person);
+    renderContacts(section, person, state);
 
     var form = section.querySelector('.contact-add-form');
     if (form) {
@@ -174,7 +281,7 @@
     return {
       syncNotes: syncNotes,
       renderContacts: function () {
-        renderContacts(section, person);
+        renderContacts(section, person, state);
       }
     };
   }

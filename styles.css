@@ -1231,3 +1231,90 @@ main {
   color: var(--rose-text);
   margin-left: 0.6rem;
 }
+
+/* ---------- contact editing ---------- */
+
+.contact-name,
+.contact-phone-static {
+  cursor: pointer;
+}
+
+.contact-name:hover,
+.contact-phone-static:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+}
+
+.contact-edit {
+  flex: none;
+  min-height: 44px;
+  padding: 0.25rem 0.4rem;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--rose-text);
+  transition: color 0.15s ease-out;
+}
+
+.contact-edit:hover { color: var(--navy); }
+
+.contact-row.is-editing {
+  display: block;
+  padding: 0.7rem 0;
+}
+
+.contact-edit-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.contact-edit-form input {
+  flex: 1;
+  min-width: 8rem;
+  min-height: 44px;
+  padding: 0.5rem 0.7rem;
+  background-color: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-family: var(--serif);
+  font-size: 1rem;
+  color: var(--navy);
+}
+
+.contact-edit-form input:focus-visible {
+  outline: 2px solid var(--rose);
+  outline-offset: 2px;
+  border-color: var(--rose);
+}
+
+.contact-cancel {
+  min-height: 44px;
+  padding: 0.5rem 0.9rem;
+  font-style: italic;
+  color: var(--rose-text);
+  transition: color 0.15s ease-out;
+}
+
+.contact-cancel:hover { color: var(--navy); }
+
+/* ---------- notepad share ---------- */
+
+.notepad-actions {
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+  flex: none;
+}
+
+.notepad-share {
+  flex: none;
+  min-height: 44px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--rose-text);
+  transition: color 0.15s ease-out;
+}
+
+.notepad-share:hover { color: var(--navy); }

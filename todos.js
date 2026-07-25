@@ -20,8 +20,9 @@
     return node;
   }
 
-  function mount(slotEl, listId) {
+  function mount(slotEl, listId, opts) {
     if (!slotEl) return;
+    opts = opts || {};
 
     // Clean up any previous mount on this slot.
     var prev = slotEl[MOUNT_KEY];
@@ -35,10 +36,18 @@
 
     var head = el("div", "notepad-head");
     var title = el("h3", "notepad-title");
+    var actions = el("div", "notepad-actions");
+    var shareBtn = null;
+    if (opts.share) {
+      shareBtn = el("button", "notepad-share", { type: "button" });
+      shareBtn.textContent = "Share";
+      actions.appendChild(shareBtn);
+    }
     var clearBtn = el("button", "notepad-clear", { type: "button" });
     clearBtn.textContent = "Clear done";
+    actions.appendChild(clearBtn);
     head.appendChild(title);
-    head.appendChild(clearBtn);
+    head.appendChild(actions);
 
     var list = el("ul", "notepad-lines");
 
@@ -224,6 +233,68 @@
     clearBtn.addEventListener("click", function () {
       Store.clearDone(listId);
     });
+
+    // ---- Share (text the list) ----
+    function buildShareText() {
+      var data = Store.getList(listId);
+      var lines = [data.name + ":"];
+      var items = (data && data.items) || [];
+      if (items.length === 0) {
+        lines.push("(nothing on the list right now)");
+      } else {
+        items.forEach(function (item) {
+          lines.push((item.done ? "✓ " : "• ") + item.text);
+        });
+      }
+      return lines.join("\n");
+    }
+
+    function flashShareLabel(label) {
+      if (!shareBtn) return;
+      shareBtn.textContent = label;
+      setTimeout(function () {
+        shareBtn.textContent = "Share";
+      }, 2500);
+    }
+
+    function copyShareText(text) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(
+          function () { flashShareLabel("Copied!"); },
+          function () { legacyCopy(text); }
+        );
+      } else {
+        legacyCopy(text);
+      }
+    }
+
+    function legacyCopy(text) {
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = false;
+      try { ok = document.execCommand("copy"); } catch (err) {}
+      document.body.removeChild(ta);
+      flashShareLabel(ok ? "Copied!" : "Copy failed");
+    }
+
+    if (shareBtn) {
+      shareBtn.addEventListener("click", function () {
+        var text = buildShareText();
+        // Phones/tablets: open the native share sheet (Messages, etc).
+        // Computers: copy to clipboard to paste into an email or text.
+        var touchDevice = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+        if (touchDevice && navigator.share) {
+          navigator.share({ text: text }).catch(function () {});
+        } else {
+          copyShareText(text);
+        }
+      });
+    }
 
     // ---- Live updates ----
     var unsubscribe = Store.subscribe(function () {

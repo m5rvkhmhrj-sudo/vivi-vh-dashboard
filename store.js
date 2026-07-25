@@ -137,6 +137,16 @@ const Store = (() => {
       });
       save();
     },
+    updateContact(person, id, patch = {}) {
+      const c = data.care[person].contacts.find(x => x.id === id);
+      if (!c) return;
+      const name = (patch.name || '').trim();
+      if (name) c.name = name;
+      if (patch.role !== undefined) c.role = (patch.role || '').trim();
+      if (patch.phone !== undefined) c.phone = (patch.phone || '').trim();
+      if (patch.email !== undefined) c.email = (patch.email || '').trim();
+      save();
+    },
     deleteContact(person, id) {
       const c = data.care[person];
       c.contacts = c.contacts.filter(x => x.id !== id);

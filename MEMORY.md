@@ -1,5 +1,14 @@
 # Vivi Memory — evolves every prompt
 
+## 2026-07-25 — Vicki's email requests: contact editing + share Jeff's list
+- Vicki emailed 2 issues: (1) couldn't edit contacts after adding (name did nothing; phone tel: link on Dell opened Windows "pick an app"), (2) wanted to share Jeff's list with Jeff by text.
+- Built contact editing: Edit button per row + click name/phone opens inline edit form (name/role/phone/email, Save/Cancel, Escape cancels). Store.updateContact added. Draft survives sync re-renders (state.draft per care section). tel: links now only on coarse-pointer devices (phones); desktop shows plain phone text that opens edit — kills the pick-an-app popup.
+- Built Share on Jeff's List pad only (Notepad.mount opts.share, app.js passes {share:true}). Phone: navigator.share → share sheet → Messages to text Jeff. Computer: copies list to clipboard, button flashes "Copied!". Format: "Jeff's List:" then • open / ✓ done lines.
+- sw v15. 21/21 playwright tests pass (desktop + iPhone emulation), screenshots verified. Test harness rebuilt in session scratchpad (old /tmp/vivi-test was gutted by tmp cleanup).
+
+## 2026-07-15 — Windows script font
+- Bill: on Windows use "Fairwater Script" (paid Positype font — can't embed). Implemented: app.js adds .os-windows class on Windows UA; CSS overrides --script to 'Fairwater Script','Sacramento','Segoe Script',cursive. Sacramento (free monoline script, closest Fairwater match) self-hosted full-latin (fonts/sacramento.woff2, fonttools-built). Mac/iOS keep Great Vibes. sw v14, live, verified with spoofed Windows UA.
+
 ## 2026-07-15 — font fix (Dell looked different)
 - Root cause: both self-hosted woff2s were the wrong Google subset — missing basic latin glyphs (V,i,v!). Each OS filled missing glyphs from different local fonts → Mac/iPhone looked right-ish, Dell wrong. Rebuilt complete woff2s from official google/fonts TTFs via fonttools (subset to full latin; Rokkitt variable pinned to wght 700). Verified zero missing glyphs. Added 'Segoe Script' fallback before generic cursive so a blocked font never falls to Comic Sans on Windows. sw v13, live. Lesson: verify glyph coverage of any downloaded Google woff2 (they're unicode-range subsets).
 
