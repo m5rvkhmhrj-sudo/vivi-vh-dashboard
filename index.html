@@ -156,6 +156,33 @@
   <!-- Event editor dialog (created/managed by calendar.js) -->
   <dialog id="event-dialog" class="event-dialog"></dialog>
 
+  <!-- Contact edit dialog -->
+  <dialog id="contact-dialog" class="event-dialog">
+    <form method="dialog" class="event-form" id="contact-form">
+      <h3 class="dialog-title">Edit contact</h3>
+      <div class="field">
+        <label for="contact-edit-name">Name</label>
+        <input type="text" id="contact-edit-name" required autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="contact-edit-role">Role</label>
+        <input type="text" id="contact-edit-role" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="contact-edit-phone">Phone</label>
+        <input type="tel" id="contact-edit-phone" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="contact-edit-email">Email</label>
+        <input type="email" id="contact-edit-email" autocomplete="off">
+      </div>
+      <div class="dialog-actions">
+        <button type="button" id="contact-edit-cancel">Cancel</button>
+        <button type="submit" class="btn-primary">Save</button>
+      </div>
+    </form>
+  </dialog>
+
   <!-- Project name dialog -->
   <dialog id="project-dialog" class="event-dialog">
     <form method="dialog" class="event-form" id="project-form">

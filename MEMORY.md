@@ -1,5 +1,11 @@
 # Vivi Memory — evolves every prompt
 
+## 2026-07-28 — contact row overlap + edit dialog (Vicki round 2)
+- Vicki (with phone screenshot): role text overlapped phone number on phone; inline edit form "didn't pop up" on phone (it opened but looked like the add form, not a popup).
+- Overlap root cause: .contact-role had flex:1 + min-width:0 → shrank to zero, text bled under phone. Fixed: rows restructured to .contact-info (flex-wrap, name/role/phone/email wrap freely) + .contact-actions (Edit, ×). Overlap regression test at 390px with her exact contacts.
+- Edit now opens real <dialog id="contact-dialog"> (same style as project dialog): labeled Name/Role/Phone/Email, Save/Cancel, backdrop + Escape close. Inline edit form removed (state/draft machinery deleted). Tap anywhere on contact info opens it too (tel/mailto links excluded via closest('a')). Hover styles scoped to @media (hover:hover) for iOS.
+- sw v16. 18/18 tests pass incl overlap + mobile dialog. LIVE.
+
 ## 2026-07-25 — Vicki's email requests: contact editing + share Jeff's list
 - Vicki emailed 2 issues: (1) couldn't edit contacts after adding (name did nothing; phone tel: link on Dell opened Windows "pick an app"), (2) wanted to share Jeff's list with Jeff by text.
 - Built contact editing: Edit button per row + click name/phone opens inline edit form (name/role/phone/email, Save/Cancel, Escape cancels). Store.updateContact added. Draft survives sync re-renders (state.draft per care section). tel: links now only on coarse-pointer devices (phones); desktop shows plain phone text that opens edit — kills the pick-an-app popup.

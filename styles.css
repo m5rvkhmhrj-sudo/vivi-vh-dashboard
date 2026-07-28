@@ -1142,13 +1142,36 @@ main {
 
 .contact-row {
   display: flex;
-  align-items: baseline;
-  gap: 0.75rem;
+  align-items: flex-start;
+  gap: 0.5rem;
   padding: 0.55rem 0;
   border-bottom: 1px solid var(--line);
 }
 
 .contact-row:last-child { border-bottom: none; }
+
+.contact-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 0.75rem;
+  row-gap: 0.15rem;
+  cursor: pointer;
+  padding-top: 0.35rem;
+}
+
+.contact-info > * {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+.contact-actions {
+  flex: none;
+  display: flex;
+  align-items: center;
+}
 
 .contact-name {
   font-weight: normal;
@@ -1158,8 +1181,6 @@ main {
 .contact-role {
   font-style: italic;
   color: rgba(31, 42, 74, 0.65);
-  flex: 1;
-  min-width: 0;
 }
 
 .contact-phone {
@@ -1234,17 +1255,6 @@ main {
 
 /* ---------- contact editing ---------- */
 
-.contact-name,
-.contact-phone-static {
-  cursor: pointer;
-}
-
-.contact-name:hover,
-.contact-phone-static:hover {
-  text-decoration: underline;
-  text-decoration-color: var(--line);
-}
-
 .contact-edit {
   flex: none;
   min-height: 44px;
@@ -1255,48 +1265,13 @@ main {
   transition: color 0.15s ease-out;
 }
 
-.contact-edit:hover { color: var(--navy); }
-
-.contact-row.is-editing {
-  display: block;
-  padding: 0.7rem 0;
+@media (hover: hover) {
+  .contact-info:hover .contact-name {
+    text-decoration: underline;
+    text-decoration-color: var(--line);
+  }
+  .contact-edit:hover { color: var(--navy); }
 }
-
-.contact-edit-form {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-.contact-edit-form input {
-  flex: 1;
-  min-width: 8rem;
-  min-height: 44px;
-  padding: 0.5rem 0.7rem;
-  background-color: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  font-family: var(--serif);
-  font-size: 1rem;
-  color: var(--navy);
-}
-
-.contact-edit-form input:focus-visible {
-  outline: 2px solid var(--rose);
-  outline-offset: 2px;
-  border-color: var(--rose);
-}
-
-.contact-cancel {
-  min-height: 44px;
-  padding: 0.5rem 0.9rem;
-  font-style: italic;
-  color: var(--rose-text);
-  transition: color 0.15s ease-out;
-}
-
-.contact-cancel:hover { color: var(--navy); }
 
 /* ---------- notepad share ---------- */
 
