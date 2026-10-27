@@ -95,12 +95,24 @@
     dialog.showModal();
   }
 
+  var bookFilter = ''; // search box text for the address book tab
+
   function renderContacts(section, person) {
     var list = section.querySelector('.contacts-list');
     if (!list) return;
 
-    var data = Store.get().care[person] || { contacts: [] };
-    var contacts = data.contacts || [];
+    var contacts = Store.contactsOf(person) || [];
+    if (person === 'book') {
+      contacts = contacts.slice().sort(function (a, b) {
+        return a.name.localeCompare(b.name);
+      });
+      var q = bookFilter.trim().toLowerCase();
+      if (q) {
+        contacts = contacts.filter(function (c) {
+          return c.name.toLowerCase().indexOf(q) !== -1;
+        });
+      }
+    }
 
     list.textContent = '';
 
@@ -109,7 +121,9 @@
       emptyLi.className = 'contact-row is-empty';
       var emptyRole = document.createElement('span');
       emptyRole.className = 'contact-role';
-      emptyRole.textContent = 'No contacts yet';
+      emptyRole.textContent = person === 'book'
+        ? (bookFilter.trim() ? 'No one matches that search' : 'No contacts yet - import from the Contacts app above, or add one below')
+        : 'No contacts yet';
       emptyLi.appendChild(emptyRole);
       list.appendChild(emptyLi);
       return;
@@ -253,12 +267,76 @@
       });
     }
 
+    if (person === 'book') setupBookExtras(section);
+
     return {
       syncNotes: syncNotes,
       renderContacts: function () {
         renderContacts(section, person);
       }
     };
+  }
+
+  /* ---- address book: search + import from a Contacts-app export (.vcf) ---- */
+
+  function parseVcf(text) {
+    var unfolded = text.replace(/\r?\n[ \t]/g, '');
+    var cards = unfolded.split(/BEGIN:VCARD/i).slice(1);
+    var out = [];
+    cards.forEach(function (cardText) {
+      var c = { name: '', role: '', phone: '', email: '' };
+      cardText.split(/\r?\n/).forEach(function (line) {
+        var ci = line.indexOf(':');
+        if (ci < 0) return;
+        var left = line.slice(0, ci);
+        var val = line.slice(ci + 1).trim();
+        var name = left.split(';')[0].replace(/^item\d+\./i, '').toUpperCase();
+        var clean = function (s) { return s.replace(/\\([,;])/g, '$1'); };
+        if (name === 'FN' && !c.name) c.name = clean(val);
+        else if (name === 'N' && !c.name) {
+          var p = val.split(';');
+          c.name = clean(((p[1] || '') + ' ' + (p[0] || '')).trim());
+        }
+        else if (name === 'TEL' && !c.phone) c.phone = val;
+        else if (name === 'EMAIL' && !c.email) c.email = clean(val);
+        else if (name === 'ORG' && !c.role) c.role = clean(val.split(';')[0]);
+      });
+      if (c.name) out.push(c);
+    });
+    return out;
+  }
+
+  function setupBookExtras(section) {
+    var search = document.getElementById('book-search');
+    if (search) {
+      search.addEventListener('input', function () {
+        bookFilter = search.value;
+        renderContacts(section, 'book');
+      });
+    }
+
+    var importBtn = document.getElementById('book-import');
+    var fileInput = document.getElementById('book-import-file');
+    if (importBtn && fileInput) {
+      importBtn.addEventListener('click', function () { fileInput.click(); });
+      fileInput.addEventListener('change', function () {
+        var f = fileInput.files[0];
+        fileInput.value = '';
+        if (!f) return;
+        var reader = new FileReader();
+        reader.onload = function () {
+          var found = parseVcf(String(reader.result || ''));
+          if (!found.length) {
+            alert('No contacts found in that file. It should be a .vcf file exported from the Contacts app.');
+            return;
+          }
+          var result = Store.importBookContacts(found);
+          alert('Done! Added ' + result.added + ' new contact' + (result.added === 1 ? '' : 's') +
+            (result.updated ? ', updated ' + result.updated : '') + '.');
+        };
+        reader.readAsText(f);
+      });
+    }
   }
 
   function init() {

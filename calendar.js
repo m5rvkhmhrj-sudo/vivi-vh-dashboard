@@ -79,6 +79,20 @@
     var events = (Store.get().events || []).filter(function (ev) {
       return occursOn(ev, dateStr);
     });
+    // her Apple Calendar feed: read-only layer, navy, edited in the Calendar app
+    if (typeof AppleCal !== 'undefined') {
+      AppleCal.eventsOn(dateStr).forEach(function (fe) {
+        events.push({
+          id: 'apple',
+          apple: true,
+          title: fe.title,
+          date: fe.date,
+          time: fe.time,
+          endTime: fe.endTime,
+          color: '#1f2a4a',
+        });
+      });
+    }
     events.sort(function (a, b) {
       var at = a.time, bt = b.time;
       if (!at && !bt) return (a.title || '').localeCompare(b.title || '');
@@ -132,11 +146,13 @@
       for (var e = 0; e < evs.length; e++) {
         var ev = evs[e];
         var hidden = overflow && e >= 2;
-        cell += '<button type="button" class="cal-event' + (hidden ? ' is-overflow' : '') +
+        var tag = ev.apple ? 'span' : 'button';
+        cell += '<' + tag + (ev.apple ? '' : ' type="button"') +
+          ' class="cal-event' + (hidden ? ' is-overflow' : '') + (ev.apple ? ' is-apple" title="From her Apple Calendar' : '') +
           '" data-id="' + escapeHtml(ev.id) +
           '" style="--ev:' + escapeHtml(ev.color || COLORS[0]) + '">' +
           (ev.time ? '<span class="cal-event-time">' + formatTime(ev.time) + '</span> ' : '') +
-          '<span class="cal-event-title">' + escapeHtml(ev.title) + '</span></button>';
+          '<span class="cal-event-title">' + escapeHtml(ev.title) + '</span></' + tag + '>';
       }
       if (overflow) {
         cell += '<button type="button" class="cal-more">+' + (evs.length - 2) + ' more</button>';
@@ -172,12 +188,15 @@
       var allday = !ev.time;
       var timeLabel = allday ? 'All day'
         : formatTime(ev.time) + (ev.endTime ? ' – ' + formatTime(ev.endTime) : '');
-      html += '<button type="button" class="agenda-event' + (allday ? ' is-allday' : '') +
+      var tag = ev.apple ? 'div' : 'button';
+      html += '<' + tag + (ev.apple ? '' : ' type="button"') +
+        ' class="agenda-event' + (allday ? ' is-allday' : '') + (ev.apple ? ' is-apple' : '') +
         '" data-id="' + escapeHtml(ev.id) +
         '" style="--ev:' + escapeHtml(ev.color || COLORS[0]) + '">' +
         '<span class="agenda-time">' + escapeHtml(timeLabel) + '</span>' +
         '<span class="agenda-title">' + escapeHtml(ev.title) + '</span>' +
-        '</button>';
+        (ev.apple ? '<span class="agenda-source">Apple Calendar</span>' : '') +
+        '</' + tag + '>';
     }
     agenda.innerHTML = html;
   }
@@ -228,6 +247,7 @@
           '<textarea id="ed-notes" rows="3"></textarea></div>' +
         '<div class="dialog-actions">' +
           '<button type="button" class="btn-danger" id="ed-delete" hidden>Delete</button>' +
+          '<button type="button" id="ed-ics" hidden title="Downloads a small file - opening it adds this event to the Apple Calendar">Add to iPhone</button>' +
           '<button type="button" id="ed-cancel">Cancel</button>' +
           '<button type="submit" class="btn-primary" id="ed-save">Save</button>' +
         '</div>' +
@@ -261,6 +281,12 @@
       dlg.close();
     });
 
+    dlg.querySelector('#ed-ics').addEventListener('click', function () {
+      if (editingId == null) return;
+      var ev = findEvent(editingId);
+      if (ev) downloadIcs(ev);
+    });
+
     dlg.querySelector('#event-form').addEventListener('submit', function (e) {
       e.preventDefault();
       saveFromForm();
@@ -287,6 +313,7 @@
     editingId = event ? event.id : null;
     dlg.querySelector('#ed-heading').textContent = event ? 'Edit event' : 'New event';
     dlg.querySelector('#ed-delete').hidden = !event;
+    dlg.querySelector('#ed-ics').hidden = !event;
 
     var allday = event ? !event.time : true;
     dlg.querySelector('#ed-title').value = event ? (event.title || '') : '';
@@ -326,6 +353,114 @@
       Store.updateEvent(editingId, data);
     } else {
       Store.addEvent(data);
+    }
+  }
+
+  // ---------- Add to iPhone (.ics download; opening it adds to Apple Calendar) ----------
+
+  function downloadIcs(ev) {
+    var esc = function (s) {
+      return String(s || '').replace(/\\/g, '\\\\').replace(/([,;])/g, '\\$1').replace(/\r?\n/g, '\\n');
+    };
+    var compact = ev.date.replace(/-/g, '');
+    var lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Vivi//EN', 'BEGIN:VEVENT',
+      'UID:' + ev.id + '@vivi-dashboard',
+      'DTSTAMP:' + new Date().toISOString().replace(/[-:]/g, '').slice(0, 15) + 'Z'];
+    if (ev.time) {
+      lines.push('DTSTART:' + compact + 'T' + ev.time.replace(':', '') + '00');
+      var end = ev.endTime || ev.time;
+      lines.push('DTEND:' + compact + 'T' + end.replace(':', '') + '00');
+    } else {
+      lines.push('DTSTART;VALUE=DATE:' + compact);
+      lines.push('DTEND;VALUE=DATE:' + toDateStr(addDays(parseDate(ev.date), 1)).replace(/-/g, ''));
+    }
+    if (ev.repeat && ev.repeat !== 'none') {
+      var rrule = 'RRULE:FREQ=' + ev.repeat.toUpperCase();
+      if (ev.repeatUntil) rrule += ';UNTIL=' + ev.repeatUntil.replace(/-/g, '') + 'T235959';
+      lines.push(rrule);
+    }
+    lines.push('SUMMARY:' + esc(ev.title));
+    if (ev.notes) lines.push('DESCRIPTION:' + esc(ev.notes));
+    lines.push('END:VEVENT', 'END:VCALENDAR');
+
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([lines.join('\r\n')], { type: 'text/calendar' }));
+    a.download = (ev.title || 'event').replace(/[^\w ]+/g, '').trim() + '.ics';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
+  // ---------- Apple Calendar link dialog ----------
+
+  function buildAppleDialog() {
+    var dlg = document.getElementById('applecal-dialog');
+    if (!dlg || typeof AppleCal === 'undefined') return;
+
+    function renderDialog() {
+      var info = AppleCal.getInfo();
+      var status = AppleCal.getStatus();
+      var html = '<form method="dialog" class="event-form">' +
+        '<h3 class="dialog-title">Apple Calendar</h3>';
+      if (info.connected) {
+        var when = info.fetchedAt
+          ? new Date(info.fetchedAt).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
+          : 'not yet';
+        html += '<p>Connected. ' + info.count + ' events from the Apple Calendar show on this calendar in navy. Last updated: ' + when + '.</p>';
+        if (status === 'loading') html += '<p class="applecal-status">Checking the calendar…</p>';
+        if (status === 'error') html += '<p class="applecal-status is-error">Could not reach the calendar. Check the internet and try Refresh.</p>';
+        html += '<div class="dialog-actions">' +
+          '<button type="button" id="applecal-disconnect" class="btn-danger">Disconnect</button>' +
+          '<button type="button" id="applecal-refresh">Refresh</button>' +
+          '<button type="submit" class="btn-primary">Done</button>' +
+          '</div>';
+      } else {
+        html += '<p>Show her Apple Calendar here too. On her iPhone: open Calendar, tap Calendars, tap the small (i) next to her calendar, turn on Public Calendar, tap Share Link, copy it, and paste it below.</p>' +
+          '<div class="field"><label for="applecal-url">Calendar link</label>' +
+          '<input type="url" id="applecal-url" placeholder="webcal://p12-caldav.icloud.com/published/…" autocomplete="off"></div>';
+        if (status === 'error') html += '<p class="applecal-status is-error">That link did not work. Make sure it is the iCloud Public Calendar link.</p>';
+        html += '<div class="dialog-actions">' +
+          '<button type="button" id="applecal-cancel">Cancel</button>' +
+          '<button type="button" id="applecal-connect" class="btn-primary">Connect</button>' +
+          '</div>';
+      }
+      html += '</form>';
+      dlg.innerHTML = html;
+
+      var on = function (id, fn) {
+        var el = dlg.querySelector('#' + id);
+        if (el) el.addEventListener('click', fn);
+      };
+      on('applecal-cancel', function () { dlg.close(); });
+      on('applecal-refresh', function () { AppleCal.refresh(); });
+      on('applecal-disconnect', function () {
+        if (confirm('Stop showing the Apple Calendar here? Nothing in the Apple Calendar itself changes.')) {
+          AppleCal.disconnect();
+        }
+      });
+      on('applecal-connect', function () {
+        var input = dlg.querySelector('#applecal-url');
+        var url = (input.value || '').trim();
+        if (!/^(webcal|https):\/\/([a-z0-9-]+\.)*icloud\.com\//i.test(url)) {
+          alert('That does not look like an iCloud calendar link. It should start with webcal:// and contain icloud.com.');
+          return;
+        }
+        Store.setAppleCalUrl(url);
+        AppleCal.refresh();
+      });
+    }
+
+    AppleCal.onChange(function () {
+      if (dlg.open) renderDialog();
+      renderAll();
+    });
+
+    var openBtn = document.getElementById('cal-apple');
+    if (openBtn) {
+      openBtn.addEventListener('click', function () {
+        renderDialog();
+        dlg.showModal();
+      });
     }
   }
 
@@ -423,6 +558,8 @@
     selectedDay = todayStr();
 
     buildDialog();
+    if (typeof AppleCal !== 'undefined') AppleCal.init();
+    buildAppleDialog();
     wireControls();
     Store.subscribe(renderAll);
     renderAll();

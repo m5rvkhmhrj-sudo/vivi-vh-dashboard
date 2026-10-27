@@ -20,6 +20,8 @@ const Store = (() => {
       jeff: { notes: '', contacts: [] },
       dad:  { notes: '', contacts: [] },
     },
+    contacts: [],       // address book: [{id, name, role, phone, email}] — synced like everything else
+    appleCalUrl: null,  // public iCloud calendar link (webcal://…); feed itself is fetched per device
   });
 
   const mergeCare = (defCare, parsedCare) => ({
@@ -123,12 +125,15 @@ const Store = (() => {
     /* ---- travel notes ---- */
     setTravelNotes(text) { data.travelNotes = text; save(); },
 
-    /* ---- care (Mark / Dad) ---- */
+    /* ---- contacts (care sections + 'book' = the address book) ---- */
+    contactsOf(person) {
+      return person === 'book' ? data.contacts : data.care[person].contacts;
+    },
     setCareNotes(person, text) { data.care[person].notes = text; save(); },
     addContact(person, { name, role, phone, email } = {}) {
       const n = (name || '').trim();
       if (!n) return;
-      data.care[person].contacts.push({
+      this.contactsOf(person).push({
         id: uid(),
         name: n,
         role: (role || '').trim(),
@@ -138,7 +143,7 @@ const Store = (() => {
       save();
     },
     updateContact(person, id, patch = {}) {
-      const c = data.care[person].contacts.find(x => x.id === id);
+      const c = this.contactsOf(person).find(x => x.id === id);
       if (!c) return;
       const name = (patch.name || '').trim();
       if (name) c.name = name;
@@ -148,10 +153,46 @@ const Store = (() => {
       save();
     },
     deleteContact(person, id) {
-      const c = data.care[person];
-      c.contacts = c.contacts.filter(x => x.id !== id);
+      if (person === 'book') {
+        data.contacts = data.contacts.filter(x => x.id !== id);
+      } else {
+        const c = data.care[person];
+        c.contacts = c.contacts.filter(x => x.id !== id);
+      }
       save();
     },
+    /* merge contacts from a Contacts-app export: match by name (case-insensitive),
+       fill/refresh fields on matches, add the rest. Never deletes, never duplicates. */
+    importBookContacts(list) {
+      let added = 0, updated = 0;
+      (list || []).forEach(nc => {
+        const n = (nc.name || '').trim();
+        if (!n) return;
+        const existing = data.contacts.find(c => c.name.trim().toLowerCase() === n.toLowerCase());
+        if (existing) {
+          let changed = false;
+          ['role', 'phone', 'email'].forEach(k => {
+            const v = (nc[k] || '').trim();
+            if (v && v !== existing[k]) { existing[k] = v; changed = true; }
+          });
+          if (changed) updated++;
+        } else {
+          data.contacts.push({
+            id: uid(),
+            name: n,
+            role: (nc.role || '').trim(),
+            phone: (nc.phone || '').trim(),
+            email: (nc.email || '').trim(),
+          });
+          added++;
+        }
+      });
+      if (added || updated) save();
+      return { added, updated };
+    },
+
+    /* ---- Apple Calendar link ---- */
+    setAppleCalUrl(url) { data.appleCalUrl = url || null; save(); },
 
     /* ---- backup ---- */
     exportJSON: () => JSON.stringify(data, null, 2),

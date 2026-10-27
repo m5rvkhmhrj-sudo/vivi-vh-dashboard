@@ -1,9 +1,10 @@
-const CACHE = 'vivi-v16';
+const CACHE = 'vivi-v17';
 const ASSETS = [
   './',
   './index.html',
   './styles.css',
   './store.js',
+  './applecal.js',
   './todos.js',
   './calendar.js',
   './app.js',

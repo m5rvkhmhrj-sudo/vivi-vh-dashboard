@@ -19,6 +19,7 @@
       <button class="tab" role="tab" aria-selected="false" data-module="calendar">Calendar</button>
       <button class="tab" role="tab" aria-selected="false" data-module="travel">Travel</button>
       <button class="tab" role="tab" aria-selected="false" data-module="care">Care</button>
+      <button class="tab" role="tab" aria-selected="false" data-module="contacts">Contacts</button>
       <button class="tab" role="tab" aria-selected="false" data-module="projects">Projects</button>
     </nav>
   </header>
@@ -53,6 +54,7 @@
           <button id="cal-prev" class="nav-btn" aria-label="Previous month">&#8249;</button>
           <button id="cal-today" class="nav-btn nav-btn-text">Today</button>
           <button id="cal-next" class="nav-btn" aria-label="Next month">&#8250;</button>
+          <button id="cal-apple" class="nav-btn nav-btn-text">Apple Calendar</button>
           <button id="cal-add" class="btn-primary">New event</button>
         </div>
       </div>
@@ -130,6 +132,31 @@
       </div>
     </section>
 
+    <!-- Module: Contacts (address book, synced; fills from a Contacts-app export) -->
+    <section id="module-contacts" class="module">
+      <div class="care-layout contacts-book-layout">
+        <div class="care-section" data-person="book">
+          <h2 class="care-title">Contacts</h2>
+          <div class="contacts-card">
+            <div class="contacts-toolbar">
+              <input type="search" id="book-search" class="contact-search" placeholder="Search by name…" autocomplete="off">
+              <button type="button" id="book-import" class="btn-primary">Import from Contacts app</button>
+              <input type="file" id="book-import-file" accept=".vcf,text/vcard,text/x-vcard,text/directory" hidden>
+            </div>
+            <p class="contacts-hint">To bring in saved contacts: on the iPhone open Contacts, tap Lists, touch and hold All Contacts, tap Export, and save or send the file. Then press Import and pick that file. Safe to repeat any time - it updates, never duplicates.</p>
+            <ul class="contacts-list"></ul>
+            <form class="contact-add-form">
+              <input type="text" class="contact-name" placeholder="Name" required>
+              <input type="text" class="contact-role" placeholder="Role">
+              <input type="tel" class="contact-phone" placeholder="Phone">
+              <input type="email" class="contact-email" placeholder="Email">
+              <button type="submit" class="btn-primary">Add</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Module 3: Projects -->
     <section id="module-projects" class="module">
       <div id="projects-index" class="projects-index">
@@ -155,6 +182,9 @@
 
   <!-- Event editor dialog (created/managed by calendar.js) -->
   <dialog id="event-dialog" class="event-dialog"></dialog>
+
+  <!-- Apple Calendar link dialog (managed by calendar.js) -->
+  <dialog id="applecal-dialog" class="event-dialog"></dialog>
 
   <!-- Contact edit dialog -->
   <dialog id="contact-dialog" class="event-dialog">
@@ -199,6 +229,7 @@
   </dialog>
 
   <script src="store.js"></script>
+  <script src="applecal.js"></script>
   <script src="todos.js"></script>
   <script src="calendar.js"></script>
   <script src="weather.js"></script>
